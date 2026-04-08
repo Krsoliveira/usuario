@@ -1,10 +1,7 @@
 package com.projetocadastro.usuario.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -14,6 +11,8 @@ import java.util.List;
 @NoArgsConstructor
 @Entity // identifica a classe como uma entidade JPA
 @Table(name = "endereco")// nomeia a tabela
+@Builder
+
 public class Endereco {
         @Id // Identificador único da tabela
         @GeneratedValue(strategy = GenerationType.IDENTITY)
