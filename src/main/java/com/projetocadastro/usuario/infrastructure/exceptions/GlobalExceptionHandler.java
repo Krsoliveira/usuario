@@ -1,4 +1,4 @@
-package com.kaiquerafael.AprendendoSpring.infrastructure.exceptions;
+package com.projetocadastro.usuario.infrastructure.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

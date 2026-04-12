@@ -1,4 +1,4 @@
-package com.kaiquerafael.AprendendoSpring.infrastructure.exceptions;
+package com.projetocadastro.usuario.infrastructure.exceptions;
 
 public class conflictException extends RuntimeException {
     public conflictException(String message) {
