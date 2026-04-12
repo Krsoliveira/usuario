@@ -35,23 +35,33 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         // Verifica se o cabeçalho existe e começa com "Bearer "
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            // Extrai o token JWT do cabeçalho
-            final String token = authorizationHeader.substring(7);
-            // Extrai o nome de usuário do token JWT
-            final String username = jwtUtil.extractUsername(token);
+            try {
+                // Extrai o token JWT do cabeçalho
+                final String token = authorizationHeader.substring(7);
+                System.out.println(">>> TOKEN RECEBIDO: " + token);
 
-            // Se o nome de usuário não for nulo e o usuário não estiver autenticado ainda
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                // Carrega os detalhes do usuário a partir do nome de usuário
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                // Valida o token JWT
-                if (jwtUtil.validateToken(token, username)) {
-                    // Cria um objeto de autenticação com as informações do usuário
-                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                            userDetails, null, userDetails.getAuthorities());
-                    // Define a autenticação no contexto de segurança
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                // Extrai o nome de usuário do token JWT
+                final String username = jwtUtil.extractUsername(token);
+                System.out.println(">>> USERNAME EXTRAÍDO: " + username);
+
+                // Se o nome de usuário não for nulo e o usuário não estiver autenticado ainda
+                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    // Carrega os detalhes do usuário a partir do nome de usuário
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                    // Valida o token JWT
+                    if (jwtUtil.validateToken(token, username)) {
+                        // Cria um objeto de autenticação com as informações do usuário
+                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                                userDetails, null, userDetails.getAuthorities());
+                        // Define a autenticação no contexto de segurança
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                        System.out.println(">>> AUTENTICAÇÃO DEFINIDA PARA: " + username);
+                    } else {
+                        System.out.println(">>> TOKEN INVÁLIDO para: " + username);
+                    }
                 }
+            } catch (Exception e) {
+                System.out.println(">>> ERRO NO FILTRO JWT: " + e.getClass().getSimpleName() + " - " + e.getMessage());
             }
         }
 
