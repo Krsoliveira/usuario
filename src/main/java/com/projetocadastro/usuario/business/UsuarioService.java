@@ -56,4 +56,15 @@ public class UsuarioService {
                 buscarUsuarioPorEmail(email); // Verifica se o email existe antes de tentar deletar.
                 usuarioRepository.deleteByEmail(email);
         }
+        public UsuarioDTO atualizaDadosUsuario(String token, UsuarioDTO dto) {
+               String email = jwtUtil.extrairEmailToken(token.substring(7));
+               dto.setSenha(dto.getSenha()!= null ? passwordEncoder.encode(dto.getSenha()) : null);
+               Usuario usuarioEntity = usuarioRepository.findByEmail(email)
+                       .orElseThrow(() -> new ResourseNotFoundException("Email não encontrado: " + email));
+
+               Usuario usuario = usuarioConverter.updateUsuario(dto, usuarioEntity);
+               //usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
+
+               return usuarioConverter.paraUsuarioDTO(usuarioRepository.save(usuario));
+        }
 }
