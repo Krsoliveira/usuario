@@ -1,10 +1,16 @@
 package com.projetocadastro.usuario.business;
 
 import com.projetocadastro.usuario.business.converter.UsuarioConverter;
+import com.projetocadastro.usuario.business.dto.EnderecoDTO;
+import com.projetocadastro.usuario.business.dto.TelefoneDTO;
 import com.projetocadastro.usuario.business.dto.UsuarioDTO;
+import com.projetocadastro.usuario.entity.Endereco;
+import com.projetocadastro.usuario.entity.Telefone;
 import com.projetocadastro.usuario.entity.Usuario;
 import com.projetocadastro.usuario.infrastructure.exceptions.ResourseNotFoundException;
 import com.projetocadastro.usuario.infrastructure.exceptions.conflictException;
+import com.projetocadastro.usuario.repository.EndereçoRepository;
+import com.projetocadastro.usuario.repository.TelefoneRepository;
 import com.projetocadastro.usuario.repository.UsuarioRepository;
 import com.projetocadastro.usuario.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +28,9 @@ public class UsuarioService {
         private final PasswordEncoder passwordEncoder;
         private final AuthenticationManager authenticationManager;
         private final JwtUtil jwtUtil;
+        private final EndereçoRepository endereçoRepository;
+        private final TelefoneRepository telefoneRepository;
+
 
         public String loginUsuario(String email, String senha) {
                 authenticationManager.authenticate(
@@ -55,5 +64,33 @@ public class UsuarioService {
         public void deletarUsuarioPorEmail(String email) {
                 buscarUsuarioPorEmail(email); // Verifica se o email existe antes de tentar deletar.
                 usuarioRepository.deleteByEmail(email);
+        }
+        public UsuarioDTO atualizaDadosUsuario(String token, UsuarioDTO dto) {
+               String email = jwtUtil.extrairEmailToken(token.substring(7));
+               dto.setSenha(dto.getSenha()!= null ? passwordEncoder.encode(dto.getSenha()) : null);
+               Usuario usuarioEntity = usuarioRepository.findByEmail(email)
+                       .orElseThrow(() -> new ResourseNotFoundException("Email não encontrado: " + email));
+
+               Usuario usuario = usuarioConverter.updateUsuario(dto, usuarioEntity);
+               //usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
+
+               return usuarioConverter.paraUsuarioDTO(usuarioRepository.save(usuario));
+        }
+        public EnderecoDTO atualizaEndereco(Long idEndereco, EnderecoDTO enderecoDTO) {
+                Endereco entity = endereçoRepository.findById(idEndereco).orElseThrow(() ->
+                        new ResourseNotFoundException("Id  não encontrado: " + idEndereco));
+
+
+                Endereco endereco = usuarioConverter.updateEndereco(enderecoDTO,entity);
+                return usuarioConverter.paraEnderecoDTO(endereçoRepository.save(endereco));
+        }
+        public TelefoneDTO atualizaTelefone(Long idTelefone, TelefoneDTO dto) {
+                Telefone entity = telefoneRepository.findById(idTelefone).orElseThrow(() ->
+                        new ResourseNotFoundException("Id  não encontrado: " + idTelefone));
+
+                Telefone telefone = usuarioConverter.updateTelefone(dto, entity);
+
+                return usuarioConverter.paraTelefoneDTO(telefoneRepository.save(telefone));
+
         }
 }
