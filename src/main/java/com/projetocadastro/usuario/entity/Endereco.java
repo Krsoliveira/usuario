@@ -3,8 +3,6 @@ package com.projetocadastro.usuario.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
-
 @Getter
 @Setter
 @AllArgsConstructor
@@ -29,7 +27,6 @@ public class Endereco {
         private String complemento;
         @Column(name = "numero", length = 100, nullable = false)
         private Long numero;
-        @OneToMany(cascade = CascadeType.ALL)
-        @JoinColumn(name = "usuario_id", referencedColumnName = "id")
-        private List<Telefone> telefones;
+        @Column(name = "usuario_id")
+        private Long usuario_id;
     }
